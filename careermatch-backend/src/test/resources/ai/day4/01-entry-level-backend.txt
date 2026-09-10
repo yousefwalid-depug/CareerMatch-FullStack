@@ -1,0 +1,18 @@
+SYNTHETIC CV — ENTRY-LEVEL BACKEND CANDIDATE
+
+PROFILE
+Entry-level backend developer focused on reliable web services.
+
+EDUCATION
+Bachelor of Science in Computer Science, Cairo Technical University, completed 2025-06-30.
+
+EXPERIENCE
+Backend Engineering Intern at Nile Labs from 2025-01-01 to 2025-06-30 (6 months).
+Built Java and Spring Boot REST APIs, wrote PostgreSQL queries, and packaged the service with Docker.
+
+PROJECTS
+Inventory Service
+Created an inventory service using Java, Spring Boot, PostgreSQL, REST APIs, and Docker.
+
+TECHNICAL SKILLS
+Java, Spring Boot, PostgreSQL, REST APIs, Docker, Python.

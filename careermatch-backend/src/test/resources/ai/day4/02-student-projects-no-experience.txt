@@ -1,0 +1,17 @@
+SYNTHETIC CV — STUDENT WITH PROJECTS
+
+EDUCATION
+Bachelor of Science in Software Engineering, Delta Institute of Technology, expected 2027-06-30.
+
+PROFESSIONAL EXPERIENCE
+None.
+
+ACADEMIC PROJECTS
+Learning Portal
+Built a responsive course portal with Angular and JavaScript and connected it to REST APIs.
+
+Schedule Optimizer
+Created a Python program that generates conflict-free class schedules.
+
+SKILLS
+Angular, JavaScript, REST APIs, Python.

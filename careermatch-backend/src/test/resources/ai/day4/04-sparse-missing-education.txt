@@ -1,0 +1,6 @@
+SYNTHETIC CV — SPARSE PROFILE WITH NO EDUCATION DETAILS
+
+Independent Backend Developer for 1 year.
+Built a Booking API with Java and REST APIs and stored booking data in PostgreSQL.
+
+No employer, dates, or education details are provided.

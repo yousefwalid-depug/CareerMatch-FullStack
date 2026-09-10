@@ -1,0 +1,247 @@
+<header class="site-header">
+  <a class="brand" href="#top" aria-label="CareerMatch home">
+    <span class="brand-mark" aria-hidden="true">CM</span>
+    <span>CareerMatch</span>
+  </a>
+  <nav aria-label="Main navigation">
+    <a href="#jobs">Jobs</a>
+    <a href="#match-flow">Match flow</a>
+  </nav>
+</header>
+
+<main id="top">
+  <section class="hero page-shell" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow">Your next move, made clear</p>
+      <h1 id="hero-title">Know Your Fit.<br><span>Build What's Missing.</span></h1>
+      <p class="hero-lede">Choose a role, upload your CV, and turn the gap between the two into a focused, evidence-based improvement plan.</p>
+      <a class="button primary" href="#jobs">Explore open roles <span aria-hidden="true">→</span></a>
+    </div>
+    <div class="hero-panel" aria-label="CareerMatch process">
+      <p class="panel-kicker">One clear path</p>
+      <ol class="journey-list">
+        <li><span>01</span><div><strong>Choose a role</strong><small>Compare against a real job description</small></div></li>
+        <li><span>02</span><div><strong>Share your CV</strong><small>PDF only, up to 5 MB</small></div></li>
+        <li><span>03</span><div><strong>See your plan</strong><small>Prioritized steps grounded in evidence</small></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="flow-section" id="jobs" aria-labelledby="jobs-heading">
+    <div class="page-shell">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">Step 1</p>
+          <h2 id="jobs-heading">Find the role you want to assess</h2>
+        </div>
+        <p>Start with the job. CareerMatch measures your CV against its actual requirements.</p>
+      </div>
+
+      @if (message()) {
+        <div class="notice error-notice" role="alert">
+          <span aria-hidden="true">!</span>
+          <p>{{ message() }}</p>
+        </div>
+      }
+
+      <div class="workspace-grid" id="match-flow">
+        <section class="jobs-pane" aria-label="Available jobs" aria-busy="{{ jobsState() === 'loading' }}">
+          <div class="pane-title">
+            <h3>Open roles</h3>
+            @if (jobsState() === 'success') { <span>{{ jobs().length }} available</span> }
+          </div>
+
+          @if (jobsState() === 'loading') {
+            <div class="skeleton-list" role="status"><span class="sr-only">Loading jobs</span>
+              @for (item of [1, 2, 3]; track item) { <div class="skeleton-card"><i></i><i></i><i></i></div> }
+            </div>
+          } @else if (jobsState() === 'error') {
+            <div class="empty-state">
+              <div class="state-icon" aria-hidden="true">↻</div>
+              <h4>Jobs could not be loaded</h4>
+              <p>Check the backend connection, then try again.</p>
+              <button class="button secondary" type="button" (click)="loadJobs()">Retry</button>
+            </div>
+          } @else if (jobsState() === 'empty') {
+            <div class="empty-state">
+              <div class="state-icon" aria-hidden="true">◇</div>
+              <h4>No jobs found</h4>
+              <p>There are no available roles yet. Try again when jobs have been added.</p>
+            </div>
+          } @else {
+            <div class="job-list">
+              @for (job of jobs(); track job.job_id) {
+                <button type="button" class="job-card" [class.selected]="selectedJob()?.job_id === job.job_id"
+                  [attr.aria-pressed]="selectedJob()?.job_id === job.job_id" (click)="selectJob(job)">
+                  <span class="job-source">{{ job.source === 'LOCAL' ? 'CareerMatch' : 'Adzuna' }}</span>
+                  <strong>{{ job.title }}</strong>
+                  <span>{{ job.company || 'Company not listed' }}</span>
+                  <small><span aria-hidden="true">⌖</span> {{ job.location || 'Location not listed' }}</small>
+                  <i aria-hidden="true">→</i>
+                </button>
+              }
+            </div>
+          }
+        </section>
+
+        <section class="detail-pane" aria-label="Selected job and CV upload" aria-busy="{{ jobDetailState() === 'loading' }}">
+          @if (jobDetailState() === 'loading') {
+            <div class="detail-loading" role="status"><span class="spinner"></span><p>Loading job details...</p></div>
+          } @else if (selectedJob(); as job) {
+            <div class="job-detail">
+              <p class="eyebrow">Selected role</p>
+              <h3>{{ job.title }}</h3>
+              <p class="company-line">{{ job.company || 'Company not listed' }}</p>
+              <p class="job-description">{{ job.description }}</p>
+              <div class="skill-columns">
+                <div><h4>Required</h4><div class="chips">
+                  @for (skill of job.required_skills; track skill) { <span class="chip required">{{ skill }}</span> }
+                  @empty { <span class="muted">None listed</span> }
+                </div></div>
+                <div><h4>Preferred</h4><div class="chips">
+                  @for (skill of job.preferred_skills; track skill) { <span class="chip preferred">{{ skill }}</span> }
+                  @empty { <span class="muted">None listed</span> }
+                </div></div>
+              </div>
+            </div>
+
+            <div class="upload-block">
+              <div class="step-label"><span>2</span><div><strong>Add your CV</strong><small>PDF only · Maximum 5 MB</small></div></div>
+              <label class="file-picker" for="cv-file">
+                <span class="upload-symbol" aria-hidden="true">↑</span>
+                <span><strong>{{ selectedFileName() || 'Choose your CV' }}</strong><small>{{ selectedFileSize() || 'Select one PDF from your device' }}</small></span>
+                <span class="browse-label">Browse</span>
+              </label>
+              <input class="sr-only" id="cv-file" type="file" accept="application/pdf,.pdf" (change)="onFileSelected($event)">
+
+              @if (uploadState() === 'success') {
+                <p class="inline-success" role="status"><span aria-hidden="true">✓</span> CV uploaded and parsed successfully.</p>
+              }
+              <button class="button secondary full-width" type="button" [disabled]="!canUpload() || uploadState() === 'success'" (click)="uploadCv()">
+                @if (uploadState() === 'loading') { <span class="spinner small" aria-hidden="true"></span> Uploading CV... } @else if (uploadState() === 'success') { CV ready } @else { Upload CV }
+              </button>
+            </div>
+
+            @if (profile(); as candidate) {
+              <details class="profile-preview">
+                <summary>Extracted profile <span>{{ candidate.extraction_confidence }} confidence</span></summary>
+                <div class="profile-content">
+                  <p><strong>{{ candidate.total_experience_months ?? 0 }}</strong> months of experience identified</p>
+                  <div class="chips">
+                    @for (skill of candidate.skills; track skill.skill_id) { <span class="chip profile">{{ skill.name }}</span> }
+                    @empty { <span class="muted">No skills identified</span> }
+                  </div>
+                  <p class="profile-counts">{{ candidate.experiences.length }} experience entries · {{ candidate.education.length }} education entries · {{ candidate.projects.length }} projects</p>
+                </div>
+              </details>
+            }
+
+            <div class="analyze-block">
+              <div class="step-label"><span>3</span><div><strong>Build your fit plan</strong><small>Uses the selected role and uploaded CV</small></div></div>
+              <button class="button primary full-width" type="button" [disabled]="!canAnalyze()" (click)="analyzeMatch()">
+                @if (analysisState() === 'loading') { <span class="spinner small" aria-hidden="true"></span> Analyzing match... } @else { Analyze my match <span aria-hidden="true">→</span> }
+              </button>
+            </div>
+          } @else {
+            <div class="empty-state select-prompt">
+              <div class="state-icon" aria-hidden="true">↖</div>
+              <h3>Select a job to begin</h3>
+              <p>Choose a role from the list to see its requirements and upload your CV.</p>
+            </div>
+          }
+        </section>
+      </div>
+    </div>
+  </section>
+
+  @if (analysisState() === 'loading') {
+    <section class="analysis-loading page-shell" aria-live="polite">
+      <span class="spinner large" aria-hidden="true"></span>
+      <div><p class="eyebrow">Working on your match</p><h2>Turning evidence into a focused plan...</h2><p>Checking skills, experience, projects, and education.</p></div>
+    </section>
+  }
+
+  @if (match(); as result) {
+    <section class="results-section" id="match-result" tabindex="-1" aria-labelledby="results-heading">
+      <div class="page-shell">
+        <div class="result-hero">
+          <div class="score-card">
+            <span class="score-label">Overall match</span>
+            <strong>{{ result.overall_match_score | number:'1.0-1' }}<small>/100</small></strong>
+            <div class="score-track" aria-hidden="true"><i [style.width.%]="result.overall_match_score"></i></div>
+            <p>Alignment score for this job description</p>
+          </div>
+          <div class="result-intro">
+            <p class="eyebrow">Your CareerMatch result</p>
+            <h2 id="results-heading">Know your fit. Build what's missing.</h2>
+            <p>Your result highlights where your CV already aligns and turns each gap into a practical next step.</p>
+            <div class="meta-row"><span>Extraction confidence: <strong>{{ result.extraction_confidence }}</strong></span><span>Match reference: <code>{{ result.match_id }}</code></span></div>
+          </div>
+        </div>
+
+        @if (result.human_review_flag) {
+          <div class="notice review-notice" role="status"><span aria-hidden="true">i</span><div><strong>Human review recommended</strong><p>Some extracted CV details have low confidence. Review the evidence before relying on this plan.</p></div></div>
+        }
+        <p class="score-disclaimer">The CareerMatch score measures alignment with this job description. It is not a hiring probability or guarantee.</p>
+
+        <section class="result-block" aria-labelledby="breakdown-title">
+          <div class="block-heading"><div><p class="eyebrow">Your fit</p><h3 id="breakdown-title">Score breakdown</h3></div><p>Each area contributes a defined weight to the overall alignment score.</p></div>
+          <div class="breakdown-grid">
+            @for (row of scoreRows(result.score_breakdown); track row.label) {
+              <article class="breakdown-card"><div><strong>{{ row.value | number:'1.0-1' }}</strong><small>/100</small></div><h4>{{ row.label }}</h4><p>{{ row.weight }} of overall score</p><div class="mini-track"><i [style.width.%]="row.value"></i></div></article>
+            }
+          </div>
+        </section>
+
+        <section class="result-block" aria-labelledby="skills-title">
+          <div class="block-heading"><div><p class="eyebrow">Requirement map</p><h3 id="skills-title">Skills at a glance</h3></div></div>
+          <div class="skill-group-grid">
+            @for (group of skillGroups(result); track group.title) {
+              <article class="skill-group" [class]="'skill-group ' + group.tone"><h4>{{ group.title }} <span>{{ group.items.length }}</span></h4>
+                @for (item of group.items; track item.skill) {
+                  <div class="skill-row"><span class="status-dot" aria-hidden="true"></span><div><strong>{{ item.skill }}</strong><small>{{ formatLabel(item.match_type) }} · {{ item.match_value | number:'1.0-2' }}</small></div></div>
+                } @empty { <p class="muted compact">Nothing in this group.</p> }
+              </article>
+            }
+          </div>
+        </section>
+
+        <section class="result-block strengths-block" aria-labelledby="strengths-title">
+          <div class="block-heading"><div><p class="eyebrow">What you bring</p><h3 id="strengths-title">Strengths and evidence</h3></div></div>
+          <div class="strength-grid">
+            @for (strength of result.strengths; track strength.strength) {
+              <article><span aria-hidden="true">✓</span><div><h4>{{ strength.strength }}</h4><p>{{ strength.evidence || 'Skill identified in the candidate profile.' }}</p></div></article>
+            } @empty { <p class="muted">No confirmed strengths were returned for this role.</p> }
+          </div>
+          @if (result.evidence.length) {
+            <details class="evidence-details"><summary>View skill evidence</summary><div class="evidence-grid">
+              @for (item of result.evidence; track item.skill) { <article><h4>{{ item.skill }}</h4><p><strong>CV</strong> {{ item.cv_evidence || 'No direct evidence' }}</p><p><strong>Job</strong> {{ item.job_evidence || 'No direct evidence' }}</p></article> }
+            </div></details>
+          }
+        </section>
+
+        <section class="plan-block" aria-labelledby="plan-title">
+          <div class="plan-heading"><div><p class="eyebrow">Your next moves</p><h3 id="plan-title">Improvement Plan</h3><p>Recommendations are ordered by priority, combining importance, potential fit gain, and estimated effort.</p></div><span>{{ result.improvement_plan.length }} actions</span></div>
+          <div class="plan-list">
+            @for (item of result.improvement_plan; track item.gap_name; let index = $index) {
+              <article class="plan-card">
+                <div class="plan-number">{{ (index + 1).toString().padStart(2, '0') }}</div>
+                <div class="plan-content">
+                  <div class="plan-card-head"><div><div class="badge-row"><span class="priority" [attr.data-priority]="item.priority_label">{{ formatLabel(item.priority_label) }} priority</span><span class="category">{{ formatLabel(item.gap_category) }}</span></div><h4>{{ item.gap_name }}</h4></div><div class="gain"><strong>+{{ item.expected_score_gain | number:'1.0-2' }}</strong><small>potential fit points</small></div></div>
+                  <div class="action-grid"><div><span>Recommended action</span><p>{{ item.recommended_action }}</p></div><div><span>Deliverable</span><p>{{ item.deliverable }}</p></div></div>
+                  <div class="plan-meta"><span><strong>{{ item.estimated_effort_min_days }}–{{ item.estimated_effort_max_days }}</strong> days effort</span><span><strong>{{ item.importance_weight }}</strong> importance</span><span><strong>{{ item.priority_score | number:'1.0-2' }}</strong> priority score</span><span>{{ formatLabel(item.status) }}</span></div>
+                  <div class="grounding"><div><span>Why it matters</span><p>{{ item.job_evidence || 'Required by this job description.' }}</p></div><div><span>Your current evidence</span><p>{{ item.cv_evidence || 'No direct CV evidence found.' }}</p></div></div>
+                  @if (item.related_existing_strengths.length) { <div class="related"><span>Build from:</span>@for (skill of item.related_existing_strengths; track skill) { <span class="chip profile">{{ skill }}</span> }</div> }
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-state plan-empty"><div class="state-icon" aria-hidden="true">✓</div><h4>No priority gaps found</h4><p>Your CV currently covers the role's identified skill requirements.</p></div>
+            }
+          </div>
+        </section>
+      </div>
+    </section>
+  }
+</main>
+
+<footer><div class="page-shell"><div class="brand"><span class="brand-mark" aria-hidden="true">CM</span><span>CareerMatch</span></div><p>Know Your Fit. Build What's Missing.</p></div></footer>

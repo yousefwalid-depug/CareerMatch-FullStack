@@ -1,0 +1,17 @@
+SYNTHETIC CV — AMBIGUOUS AND NEGATED SKILL WORDING
+
+SKILLS USED
+JavaScript.
+
+PROJECT
+Feedback Dashboard
+Built the Feedback Dashboard with JavaScript and connected it to REST APIs.
+
+LEARNING INTERESTS
+I have read about Docker and AWS but have not used either technology.
+I plan to learn Java, Spring Boot, and PostgreSQL next year.
+
+PERSONAL DETAILS — SYNTHETIC TEST DATA
+Gender: nonbinary.
+Nationality: Exampleland.
+Marital status: single.

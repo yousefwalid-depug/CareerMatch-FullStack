@@ -1,0 +1,12 @@
+SYNTHETIC CV — PROFESSIONAL EXPERIENCE WITH UNUSUAL HEADINGS
+
+WHAT I SHIPPED
+Software Engineer at Atlas Systems from 2022-02-01 to 2024-07-31 (30 months).
+Delivered Java and Spring Boot REST APIs backed by PostgreSQL.
+Deployed services to AWS with Docker and maintained CI/CD pipelines.
+
+LEARNING RECORD
+Bachelor of Science in Information Systems, Horizon University, completed 2021-06-30.
+
+TOOLS USED IN PRODUCTION
+Java, Spring Boot, PostgreSQL, REST APIs, AWS, Docker, CI/CD.
